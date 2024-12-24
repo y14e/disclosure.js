@@ -209,6 +209,13 @@ summary {
     </div>
   </details>
 </div>
-<script src="disclosure.js"></script>
+<script type="module">
+import Disclosure from './disclosure.js';
+window.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-disclosure]').forEach(a => {
+    new Disclosure(a);
+  });
+});
+</script>
 </body>
 </html>
