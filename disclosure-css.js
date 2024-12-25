@@ -1,4 +1,4 @@
-export default class Disclosure {
+export default class {
   constructor(a) {
     const b = a.querySelectorAll('summary:not(:scope summary + * *)');
     b.forEach(c => {
