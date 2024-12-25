@@ -1,4 +1,3 @@
-// disclosure [20241224]
 export default class Disclosure {
   constructor(a) {
     const b = a.querySelectorAll('summary:not(:scope summary + * *)');
