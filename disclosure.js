@@ -15,35 +15,35 @@ class Disclosure {
       });
     });
   }
-  toggle(detail, open) {
-    detail.dataset.disclosureTransitioning = '';
-    const name = detail.name;
+  toggle(details, open) {
+    details.dataset.disclosureTransitioning = '';
+    const name = details.name;
     if (name) {
-      detail.removeAttribute('name');
+      details.removeAttribute('name');
       const opened = document.querySelector(`details[name="${name}"][open]`);
-      if (open && opened && opened !== detail) {
+      if (open && opened && opened !== details) {
         this.toggle(opened, false);
       }
     }
     if (open) {
-      detail.open = true;
+      details.open = true;
     } else {
-      detail.dataset.disclosureClosing = '';
+      details.dataset.disclosureClosing = '';
     }
-    const summary = detail.querySelector('summary');
+    const summary = details.querySelector('summary');
     const content = summary.nextElementSibling;
     const height = `${content.scrollHeight}px`;
     content.addEventListener('transitionend', function once(event) {
       if (event.propertyName !== 'max-height') {
         return;
       }
-      delete detail.dataset.disclosureTransitioning;
+      delete details.dataset.disclosureTransitioning;
       if (name) {
-        detail.name = name;
+        details.name = name;
       }
       if (!open) {
-        detail.open = false;
-        delete detail.dataset.disclosureClosing;
+        details.open = false;
+        delete details.dataset.disclosureClosing;
       }
       content.style.maxHeight = content.style.overflow = '';
       this.removeEventListener('transitionend', once);
