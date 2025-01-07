@@ -13,7 +13,7 @@ class Disclosure {
     });
   }
   keydown(event) {
-    const key = event.key;
+    const { key } = event;
     if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) {
       return;
     }

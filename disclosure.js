@@ -65,7 +65,7 @@ class Disclosure {
     this.toggle(detail, !detail.open);
   }
   keydown(event) {
-    const key = event.key;
+    const { key } = event;
     if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) {
       return;
     }
