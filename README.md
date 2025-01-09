@@ -1,5 +1,5 @@
 # disclosure.js
-A disclosure pattern implementation in JS. Using the `<details>` element.
+A disclosure pattern implementation in JS. Using the `<details>` and `<summary>` element.
 ## Installation
 ```js
 import Disclosure from './disclosure.js';
