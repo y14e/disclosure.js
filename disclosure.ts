@@ -9,7 +9,7 @@ class Disclosure {
     this.initialize();
   }
 
-  private initialize(): void {
+  private initialize() {
     this.summaries.forEach(summary => {
       summary.addEventListener('click', e => {
         this.handleClick(e);
@@ -20,7 +20,7 @@ class Disclosure {
     });
   }
 
-  private toggle(details: HTMLDetailsElement, isOpen: boolean): void {
+  private toggle(details: HTMLDetailsElement, isOpen: boolean) {
     details.dataset.disclosureTransitioning = '';
     const name = details.name;
     if (name) {
@@ -62,7 +62,7 @@ class Disclosure {
     });
   }
 
-  private handleClick(e: MouseEvent): void {
+  private handleClick(e: MouseEvent) {
     e.preventDefault();
     if (this.element.querySelector('[data-disclosure-transitioning]')) {
       return;
@@ -71,7 +71,7 @@ class Disclosure {
     this.toggle(detail, !detail.open);
   }
 
-  private handleKeyDown(e: KeyboardEvent): void {
+  private handleKeyDown(e: KeyboardEvent) {
     const { key } = e;
     if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) {
       return;
