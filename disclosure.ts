@@ -20,14 +20,14 @@ class Disclosure {
     });
   }
 
-  private toggle(details: HTMLDetailsElement, isOpen: boolean) {
+  private state(details: HTMLDetailsElement, isOpen: boolean) {
     details.dataset.disclosureTransitioning = '';
     const name = details.name;
     if (name) {
       details.removeAttribute('name');
       const opened = document.querySelector(`details[name="${name}"][open]`) as HTMLDetailsElement;
       if (isOpen && opened && opened !== details) {
-        this.toggle(opened, false);
+        this.close(opened);
       }
     }
     if (isOpen) {
@@ -67,8 +67,7 @@ class Disclosure {
     if (this.element.querySelector('[data-disclosure-transitioning]')) {
       return;
     }
-    const detail = (e.currentTarget as HTMLElement).parentElement as HTMLDetailsElement;
-    this.toggle(detail, !detail.open);
+    this.toggle((e.currentTarget as HTMLElement).parentElement as HTMLDetailsElement);
   }
 
   private handleKeyDown(e: KeyboardEvent) {
@@ -80,6 +79,18 @@ class Disclosure {
     const index = [...this.summaries].indexOf(document.activeElement as HTMLElement);
     const length = this.summaries.length;
     this.summaries[key === 'ArrowUp' ? (index - 1 < 0 ? length - 1 : index - 1) : key === 'ArrowDown' ? (index + 1) % length : key === 'Home' ? 0 : length - 1].focus();
+  }
+
+  open(details: HTMLDetailsElement) {
+    this.state(details, true);
+  }
+
+  close(details: HTMLDetailsElement) {
+    this.state(details, false);
+  }
+
+  toggle(details: HTMLDetailsElement) {
+    this.state(details, !details.open);
   }
 }
 
