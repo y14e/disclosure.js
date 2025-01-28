@@ -11,8 +11,8 @@ class Disclosure {
 
   private initialize() {
     this.summaries.forEach(summary => {
-      summary.addEventListener('keydown', e => {
-        this.handleKeyDown(e);
+      summary.addEventListener('keydown', event => {
+        this.handleKeyDown(event);
       });
     });
   }
@@ -21,12 +21,12 @@ class Disclosure {
     details.open = isOpen;
   }
 
-  private handleKeyDown(e: KeyboardEvent) {
-    const { key } = e;
+  private handleKeyDown(event: KeyboardEvent) {
+    const { key } = event;
     if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) {
       return;
     }
-    e.preventDefault();
+    event.preventDefault();
     const index = [...this.summaries].indexOf(document.activeElement as HTMLElement);
     const length = this.summaries.length;
     this.summaries[key === 'ArrowUp' ? (index - 1 < 0 ? length - 1 : index - 1) : key === 'ArrowDown' ? (index + 1) % length : key === 'Home' ? 0 : length - 1].focus();

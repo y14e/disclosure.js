@@ -11,11 +11,11 @@ class Disclosure {
 
   private initialize() {
     this.summaries.forEach(summary => {
-      summary.addEventListener('click', e => {
-        this.handleClick(e);
+      summary.addEventListener('click', event => {
+        this.handleClick(event);
       });
-      summary.addEventListener('keydown', e => {
-        this.handleKeyDown(e);
+      summary.addEventListener('keydown', event => {
+        this.handleKeyDown(event);
       });
     });
   }
@@ -38,8 +38,8 @@ class Disclosure {
     const summary = details.querySelector('summary') as HTMLElement;
     const content = summary.nextElementSibling as HTMLElement;
     const height = `${content.scrollHeight}px`;
-    content.addEventListener('transitionend', function handleTransitionEnd(e) {
-      if (e.propertyName !== 'max-height') {
+    content.addEventListener('transitionend', function handleTransitionEnd(event: TransitionEvent) {
+      if (event.propertyName !== 'max-height') {
         return;
       }
       delete details.dataset.disclosureTransitioning;
@@ -62,20 +62,20 @@ class Disclosure {
     });
   }
 
-  private handleClick(e: MouseEvent) {
-    e.preventDefault();
+  private handleClick(event: MouseEvent) {
+    event.preventDefault();
     if (this.element.querySelector('[data-disclosure-transitioning]')) {
       return;
     }
-    this.toggle((e.currentTarget as HTMLElement).parentElement as HTMLDetailsElement);
+    this.toggle((event.currentTarget as HTMLElement).parentElement as HTMLDetailsElement);
   }
 
-  private handleKeyDown(e: KeyboardEvent) {
-    const { key } = e;
+  private handleKeyDown(event: KeyboardEvent) {
+    const { key } = event;
     if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) {
       return;
     }
-    e.preventDefault();
+    event.preventDefault();
     const index = [...this.summaries].indexOf(document.activeElement as HTMLElement);
     const length = this.summaries.length;
     this.summaries[key === 'ArrowUp' ? (index - 1 < 0 ? length - 1 : index - 1) : key === 'ArrowDown' ? (index + 1) % length : key === 'Home' ? 0 : length - 1].focus();
