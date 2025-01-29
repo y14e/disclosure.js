@@ -21,7 +21,8 @@ class Disclosure {
   }
 
   private state(details: HTMLDetailsElement, isOpen: boolean) {
-    details.dataset.disclosureTransitioning = '';
+    const element = this.element;
+    element.dataset.disclosureTransitioning = '';
     const name = details.name;
     if (name) {
       details.removeAttribute('name');
@@ -42,7 +43,7 @@ class Disclosure {
       if (event.propertyName !== 'max-height') {
         return;
       }
-      delete details.dataset.disclosureTransitioning;
+      delete element.dataset.disclosureTransitioning;
       if (name) {
         details.name = name;
       }
@@ -50,7 +51,7 @@ class Disclosure {
         details.open = false;
         delete details.dataset.disclosureClosing;
       }
-      content.style.maxHeight = content.style.overflow = '';
+      this.style.maxHeight = this.style.overflow = '';
       this.removeEventListener('transitionend', handleTransitionEnd);
     });
     content.style.cssText += `
@@ -66,7 +67,7 @@ class Disclosure {
 
   private handleClick(event: MouseEvent) {
     event.preventDefault();
-    if (this.element.querySelector('[data-disclosure-transitioning]')) {
+    if (this.element.hasAttribute('data-disclosure-transitioning')) {
       return;
     }
     this.toggle((event.currentTarget as HTMLElement).parentElement as HTMLDetailsElement);
