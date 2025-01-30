@@ -1,9 +1,24 @@
+type DisclosureOptions = {
+  animation?: {
+    duration?: number;
+    easing?: string;
+  };
+};
+
 class Disclosure {
   element: HTMLElement;
+  options: Required<DisclosureOptions>;
   summaries: NodeListOf<HTMLElement>;
 
-  constructor(element: HTMLElement) {
+  constructor(element: HTMLElement, options?: DisclosureOptions) {
     this.element = element;
+    this.options = {
+      animation: {
+        duration: 300,
+        easing: 'ease',
+        ...options?.animation,
+      },
+    };
     const NOT_NESTED = ':not(:scope summary + * *)';
     this.summaries = this.element.querySelectorAll(`summary${NOT_NESTED}`);
     this.initialize();
@@ -39,10 +54,8 @@ class Disclosure {
     const summary = details.querySelector('summary') as HTMLElement;
     const content = summary.nextElementSibling as HTMLElement;
     const height = `${content.scrollHeight}px`;
-    content.addEventListener('transitionend', function handleTransitionEnd(event: TransitionEvent) {
-      if (event.propertyName !== 'max-height') {
-        return;
-      }
+    content.style.overflow = 'clip';
+    content.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.options.animation.duration, easing: this.options.animation.easing }).addEventListener('finish', () => {
       delete element.dataset.disclosureTransitioning;
       if (name) {
         details.name = name;
@@ -51,17 +64,7 @@ class Disclosure {
         details.open = false;
         delete details.dataset.disclosureClosing;
       }
-      this.style.maxHeight = this.style.overflow = '';
-      this.removeEventListener('transitionend', handleTransitionEnd);
-    });
-    content.style.cssText += `
-      max-height: ${isOpen ? '0' : height};
-      overflow: clip;
-    `;
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        content.style.maxHeight = isOpen ? height : '0';
-      });
+      content.style.maxHeight = content.style.overflow = '';
     });
   }
 
