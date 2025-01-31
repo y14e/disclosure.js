@@ -37,7 +37,7 @@ class Disclosure {
 
   private state(details: HTMLDetailsElement, isOpen: boolean) {
     const element = this.element;
-    element.dataset.disclosureTransitioning = '';
+    element.dataset.disclosureAnimating = '';
     const name = details.name;
     if (name) {
       details.removeAttribute('name');
@@ -56,7 +56,7 @@ class Disclosure {
     const height = `${content.scrollHeight}px`;
     content.style.overflow = 'clip';
     content.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.options.animation.duration, easing: this.options.animation.easing }).addEventListener('finish', () => {
-      delete element.dataset.disclosureTransitioning;
+      delete element.dataset.disclosureAnimating;
       if (name) {
         details.name = name;
       }
@@ -70,7 +70,7 @@ class Disclosure {
 
   private handleClick(event: MouseEvent) {
     event.preventDefault();
-    if (this.element.hasAttribute('data-disclosure-transitioning')) {
+    if (this.element.hasAttribute('data-disclosure-animating')) {
       return;
     }
     this.toggle((event.currentTarget as HTMLElement).parentElement as HTMLDetailsElement);
