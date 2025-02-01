@@ -5,7 +5,7 @@ class Disclosure {
   constructor(element: HTMLElement) {
     this.element = element;
     const NOT_NESTED = ':not(:scope summary + * *)';
-    this.summaries = this.element.querySelectorAll(`summary${NOT_NESTED}`);
+    this.summaries = this.element.querySelectorAll(`summary${NOT_NESTED}:not([aria-disabled="true"])`);
     this.initialize();
   }
 
