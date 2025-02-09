@@ -10,11 +10,7 @@ class Disclosure {
   }
 
   private initialize() {
-    this.summaries.forEach(summary => {
-      summary.addEventListener('keydown', event => {
-        this.handleKeyDown(event);
-      });
-    });
+    this.summaries.forEach(summary => summary.addEventListener('keydown', event => this.handleKeyDown(event)));
   }
 
   private state(details: HTMLDetailsElement, isOpen: boolean) {
@@ -23,9 +19,7 @@ class Disclosure {
 
   private handleKeyDown(event: KeyboardEvent) {
     const { key } = event;
-    if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) {
-      return;
-    }
+    if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) return;
     event.preventDefault();
     const index = [...this.summaries].indexOf(document.activeElement as HTMLElement);
     const length = this.summaries.length;
