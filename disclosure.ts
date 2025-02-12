@@ -48,7 +48,10 @@ class Disclosure {
     const summary = details.querySelector('summary') as HTMLElement;
     const content = summary.nextElementSibling as HTMLElement;
     const height = `${content.scrollHeight}px`;
-    content.style.overflow = 'clip';
+    content.style.cssText += `
+      overflow: clip;
+      will-change: max-height;
+    `;
     content.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.options.animation.duration, easing: this.options.animation.easing }).addEventListener('finish', () => {
       delete element.dataset.disclosureAnimating;
       if (name) details.name = name;
@@ -56,7 +59,7 @@ class Disclosure {
         details.open = false;
         delete details.dataset.disclosureClosing;
       }
-      content.style.maxHeight = content.style.overflow = '';
+      content.style.maxHeight = content.style.overflow = content.style.willChange = '';
     });
   }
 
