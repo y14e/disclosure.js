@@ -34,7 +34,7 @@ class Disclosure {
     });
   }
 
-  private state(details: HTMLDetailsElement, isOpen: boolean): void {
+  private toggle(details: HTMLDetailsElement, isOpen: boolean): void {
     const element = this.element;
     element.dataset.disclosureAnimating = '';
     const name = details.name;
@@ -69,7 +69,8 @@ class Disclosure {
   private handleClick(event: MouseEvent): void {
     event.preventDefault();
     if (this.element.hasAttribute('data-disclosure-animating')) return;
-    this.toggle((event.currentTarget as HTMLElement).parentElement as HTMLDetailsElement);
+    const details = (event.currentTarget as HTMLElement).parentElement as HTMLDetailsElement;
+    this.toggle(details, !details.open);
   }
 
   private handleKeyDown(event: KeyboardEvent): void {
@@ -82,15 +83,11 @@ class Disclosure {
   }
 
   open(details: HTMLDetailsElement): void {
-    this.state(details, true);
+    this.toggle(details, true);
   }
 
   close(details: HTMLDetailsElement): void {
-    this.state(details, false);
-  }
-
-  toggle(details: HTMLDetailsElement): void {
-    this.state(details, !details.open);
+    this.toggle(details, false);
   }
 }
 
