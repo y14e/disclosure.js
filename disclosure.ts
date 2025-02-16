@@ -37,32 +37,30 @@ class Disclosure {
   private toggle(details: HTMLDetailsElement, isOpen: boolean): void {
     const element = this.element;
     element.setAttribute('data-disclosure-animating', '');
-    const name = details.name;
+    const name = details.getAttribute('name');
     if (name) {
       details.removeAttribute('name');
       const opened = document.querySelector(`details[name="${name}"][open]`) as HTMLDetailsElement;
       if (isOpen && opened && opened !== details) this.close(opened);
     }
     if (isOpen) {
-      details.open = true;
+      details.setAttribute('open', '');
     } else {
       details.setAttribute('data-disclosure-closing', '');
     }
     const summary = details.querySelector('summary') as HTMLElement;
     const content = summary.nextElementSibling as HTMLElement;
     const height = `${content.scrollHeight}px`;
-    content.style.cssText += `
-      overflow: clip;
-      will-change: ${[...new Set(window.getComputedStyle(content).getPropertyValue('will-change').split(',')).add('max-height').values()].filter(value => value !== 'auto').join(',')};
-    `;
+    content.style.setProperty('overflow', 'clip');
+    content.style.setProperty('will-change', [...new Set(window.getComputedStyle(content).getPropertyValue('will-change').split(',')).add('max-height').values()].filter(value => value !== 'auto').join(','));
     content.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.options.animation.duration, easing: this.options.animation.easing }).addEventListener('finish', () => {
       element.removeAttribute('data-disclosure-animating');
-      if (name) details.name = name;
+      if (name) details.setAttribute('name', name);
       if (!isOpen) {
-        details.open = false;
+        details.removeAttribute('open');
         details.removeAttribute('data-disclosure-closing');
       }
-      content.style.maxHeight = content.style.overflow = content.style.willChange = '';
+      ['max-height', 'overflow', 'will-change'].forEach(property => content.style.removeProperty(property));
     });
   }
 
@@ -70,7 +68,7 @@ class Disclosure {
     event.preventDefault();
     if (this.element.hasAttribute('data-disclosure-animating')) return;
     const details = (event.currentTarget as HTMLElement).parentElement as HTMLDetailsElement;
-    this.toggle(details, !details.open);
+    this.toggle(details, !details.hasAttribute('open'));
   }
 
   private handleKeyDown(event: KeyboardEvent): void {

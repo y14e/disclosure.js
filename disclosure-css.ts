@@ -14,7 +14,11 @@ class Disclosure {
   }
 
   private toggle(details: HTMLDetailsElement, isOpen: boolean): void {
-    details.open = isOpen;
+    if (isOpen) {
+      details.setAttribute('open', '');
+    } else {
+      details.removeAttribute('open');
+    }
   }
 
   private handleKeyDown(event: KeyboardEvent): void {
