@@ -36,7 +36,7 @@ class Disclosure {
 
   private toggle(details: HTMLDetailsElement, isOpen: boolean): void {
     const element = this.element;
-    element.dataset.disclosureAnimating = '';
+    element.setAttribute('data-disclosure-animating', '');
     const name = details.name;
     if (name) {
       details.removeAttribute('name');
@@ -46,7 +46,7 @@ class Disclosure {
     if (isOpen) {
       details.open = true;
     } else {
-      details.dataset.disclosureClosing = '';
+      details.setAttribute('data-disclosure-closing', '');
     }
     const summary = details.querySelector('summary') as HTMLElement;
     const content = summary.nextElementSibling as HTMLElement;
@@ -56,11 +56,11 @@ class Disclosure {
       will-change: max-height;
     `;
     content.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.options.animation.duration, easing: this.options.animation.easing }).addEventListener('finish', () => {
-      delete element.dataset.disclosureAnimating;
+      element.removeAttribute('data-disclosure-animating');
       if (name) details.name = name;
       if (!isOpen) {
         details.open = false;
-        delete details.dataset.disclosureClosing;
+        details.removeAttribute('data-disclosure-closing');
       }
       content.style.maxHeight = content.style.overflow = content.style.willChange = '';
     });
