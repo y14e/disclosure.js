@@ -1,4 +1,4 @@
-type DisclosureOptions = {
+type Props = {
   animation: {
     duration: number;
     easing: string;
@@ -7,19 +7,19 @@ type DisclosureOptions = {
 
 class Disclosure {
   element: HTMLElement;
-  options: Required<DisclosureOptions>;
+  props: Props;
   summaries: NodeListOf<HTMLElement>;
 
-  constructor(element: HTMLElement, options?: Partial<DisclosureOptions>) {
+  constructor(element: HTMLElement, props?: Partial<Props>) {
     this.element = element;
-    this.options = {
+    this.props = {
       animation: {
         duration: 300,
         easing: 'ease',
-        ...options?.animation,
+        ...props?.animation,
       },
     };
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.options.animation.duration = 0;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.props.animation.duration = 0;
     const NOT_NESTED = ':not(:scope summary + * *)';
     this.summaries = this.element.querySelectorAll(`summary${NOT_NESTED}:not([aria-disabled="true"])`);
     this.initialize();
@@ -51,7 +51,7 @@ class Disclosure {
     const height = `${content.scrollHeight}px`;
     content.style.setProperty('overflow', 'clip');
     content.style.setProperty('will-change', [...new Set(window.getComputedStyle(content).getPropertyValue('will-change').split(',')).add('max-height').values()].filter(value => value !== 'auto').join(','));
-    content.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.options.animation.duration, easing: this.options.animation.easing }).addEventListener('finish', () => {
+    content.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.props.animation.duration, easing: this.props.animation.easing }).addEventListener('finish', () => {
       element.removeAttribute('data-disclosure-animating');
       if (name) details.setAttribute('name', name);
       if (!isOpen) {
