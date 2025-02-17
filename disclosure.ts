@@ -1,7 +1,7 @@
 type DisclosureOptions = {
-  animation?: {
-    duration?: number;
-    easing?: string;
+  animation: {
+    duration: number;
+    easing: string;
   };
 };
 
@@ -10,7 +10,7 @@ class Disclosure {
   options: Required<DisclosureOptions>;
   summaries: NodeListOf<HTMLElement>;
 
-  constructor(element: HTMLElement, options?: DisclosureOptions) {
+  constructor(element: HTMLElement, options?: Partial<DisclosureOptions>) {
     this.element = element;
     this.options = {
       animation: {
