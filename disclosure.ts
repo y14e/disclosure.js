@@ -31,6 +31,7 @@ class Disclosure {
       summary.addEventListener('click', event => this.handleClick(event));
       summary.addEventListener('keydown', event => this.handleKeyDown(event));
     });
+    this.element.setAttribute('data-disclosure-initialized', '');
   }
 
   private toggle(details: HTMLDetailsElement, isOpen: boolean): void {
