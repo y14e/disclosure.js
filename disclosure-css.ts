@@ -1,12 +1,16 @@
 class Disclosure {
   element: HTMLElement;
+  details: NodeListOf<HTMLElement>;
   summaries: NodeListOf<HTMLElement>;
+  contents: NodeListOf<HTMLElement>;
 
   constructor(element: HTMLElement) {
     this.element = element;
     const NOT_NESTED = ':not(:scope summary + * *)';
-    this.summaries = this.element.querySelectorAll(`summary${NOT_NESTED}:not([aria-disabled="true"])`);
-    if (!this.summaries.length) return;
+    this.details = this.element.querySelectorAll(`details${NOT_NESTED}`);
+    this.summaries = this.element.querySelectorAll(`summary${NOT_NESTED}`);
+    this.contents = this.element.querySelectorAll(`summary${NOT_NESTED} + *`);
+    if (!this.details.length || !this.details.length || !this.contents.length) return;
     this.initialize();
   }
 
@@ -27,8 +31,9 @@ class Disclosure {
     const { key } = event;
     if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) return;
     event.preventDefault();
-    const position = [...this.summaries].indexOf(document.activeElement as HTMLElement);
-    const length = this.summaries.length;
+    const summaries = [...this.summaries].filter(summary => !summary.hasAttribute('aria-disabled'));
+    const position = summaries.indexOf(document.activeElement as HTMLElement);
+    const length = summaries.length;
     let index = position;
     switch (key) {
       case 'ArrowUp':
@@ -44,7 +49,7 @@ class Disclosure {
         index = length - 1;
         break;
     }
-    this.summaries[index].focus();
+    summaries[index].focus();
   }
 
   open(details: HTMLDetailsElement): void {
