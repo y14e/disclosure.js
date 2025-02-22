@@ -6,14 +6,14 @@ type Props = {
 };
 
 class Disclosure {
-  element: HTMLElement;
+  root: HTMLElement;
   props: Props;
   details: NodeListOf<HTMLElement>;
   summaries: NodeListOf<HTMLElement>;
   contents: NodeListOf<HTMLElement>;
 
-  constructor(element: HTMLElement, props?: Partial<Props>) {
-    this.element = element;
+  constructor(root: HTMLElement, props?: Partial<Props>) {
+    this.root = root;
     this.props = {
       animation: {
         duration: 300,
@@ -23,9 +23,9 @@ class Disclosure {
     };
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.props.animation.duration = 0;
     const NOT_NESTED = ':not(:scope summary + * *)';
-    this.details = this.element.querySelectorAll(`details${NOT_NESTED}`);
-    this.summaries = this.element.querySelectorAll(`summary${NOT_NESTED}`);
-    this.contents = this.element.querySelectorAll(`summary${NOT_NESTED} + *`);
+    this.details = this.root.querySelectorAll(`details${NOT_NESTED}`);
+    this.summaries = this.root.querySelectorAll(`summary${NOT_NESTED}`);
+    this.contents = this.root.querySelectorAll(`summary${NOT_NESTED} + *`);
     if (!this.details.length || !this.details.length || !this.contents.length) return;
     this.initialize();
   }
@@ -35,12 +35,12 @@ class Disclosure {
       summary.addEventListener('click', event => this.handleClick(event));
       summary.addEventListener('keydown', event => this.handleKeyDown(event));
     });
-    this.element.setAttribute('data-disclosure-initialized', '');
+    this.root.setAttribute('data-disclosure-initialized', '');
   }
 
   private toggle(details: HTMLDetailsElement, isOpen: boolean): void {
-    const element = this.element;
-    element.setAttribute('data-disclosure-animating', '');
+    const root = this.root;
+    root.setAttribute('data-disclosure-animating', '');
     const name = details.getAttribute('name');
     if (name) {
       details.removeAttribute('name');
@@ -58,7 +58,7 @@ class Disclosure {
     content.style.setProperty('overflow', 'clip');
     content.style.setProperty('will-change', [...new Set(window.getComputedStyle(content).getPropertyValue('will-change').split(',')).add('max-height').values()].filter(value => value !== 'auto').join(','));
     content.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.props.animation.duration, easing: this.props.animation.easing }).addEventListener('finish', () => {
-      element.removeAttribute('data-disclosure-animating');
+      root.removeAttribute('data-disclosure-animating');
       if (name) details.setAttribute('name', name);
       if (!isOpen) {
         details.removeAttribute('open');
@@ -70,7 +70,7 @@ class Disclosure {
 
   private handleClick(event: MouseEvent): void {
     event.preventDefault();
-    if (this.element.hasAttribute('data-disclosure-animating')) return;
+    if (this.root.hasAttribute('data-disclosure-animating')) return;
     const details = (event.currentTarget as HTMLElement).parentElement as HTMLDetailsElement;
     this.toggle(details, !details.hasAttribute('open'));
   }
