@@ -21,7 +21,9 @@ class Disclosure {
         easing: 'ease',
       },
     };
-    this.settings = { animation: Object.assign({}, this.defaults.animation, options?.animation) };
+    this.settings = {
+      animation: { ...this.defaults.animation, ...options?.animation },
+    };
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.settings.animation.duration = 0;
     const NOT_NESTED = ':not(:scope summary + * *)';
     this.details = this.root.querySelectorAll(`details${NOT_NESTED}`);
