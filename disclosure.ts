@@ -1,4 +1,4 @@
-type Props = {
+type DisclosureOptions = {
   animation: {
     duration: number;
     easing: string;
@@ -7,21 +7,22 @@ type Props = {
 
 class Disclosure {
   root: HTMLElement;
-  props: Props;
+  defaults: DisclosureOptions;
+  settings: DisclosureOptions;
   details: NodeListOf<HTMLElement>;
   summaries: NodeListOf<HTMLElement>;
   contents: NodeListOf<HTMLElement>;
 
-  constructor(root: HTMLElement, props?: Partial<Props>) {
+  constructor(root: HTMLElement, options?: Partial<DisclosureOptions>) {
     this.root = root;
-    this.props = {
+    this.defaults = {
       animation: {
         duration: 300,
         easing: 'ease',
-        ...props?.animation,
       },
     };
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.props.animation.duration = 0;
+    this.settings = { animation: Object.assign({}, this.defaults.animation, options?.animation) };
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.settings.animation.duration = 0;
     const NOT_NESTED = ':not(:scope summary + * *)';
     this.details = this.root.querySelectorAll(`details${NOT_NESTED}`);
     this.summaries = this.root.querySelectorAll(`summary${NOT_NESTED}`);
@@ -57,7 +58,7 @@ class Disclosure {
     const height = `${content.scrollHeight}px`;
     content.style.setProperty('overflow', 'clip');
     content.style.setProperty('will-change', [...new Set(window.getComputedStyle(content).getPropertyValue('will-change').split(',')).add('max-height').values()].filter(value => value !== 'auto').join(','));
-    content.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.props.animation.duration, easing: this.props.animation.easing }).addEventListener('finish', () => {
+    content.animate({ maxHeight: [isOpen ? '0' : height, isOpen ? height : '0'] }, { duration: this.settings.animation.duration, easing: this.settings.animation.easing }).addEventListener('finish', () => {
       root.removeAttribute('data-disclosure-animating');
       if (name) details.setAttribute('name', name);
       if (!isOpen) {
