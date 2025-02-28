@@ -55,19 +55,19 @@ class Disclosure {
     } else {
       details.setAttribute('data-disclosure-closing', '');
     }
-    const summary = details.querySelector('summary') as HTMLElement;
-    const content = summary.nextElementSibling as HTMLElement;
-    const height = `${content.scrollHeight}px`;
-    content.style.setProperty('overflow', 'clip');
-    content.style.setProperty('will-change', [...new Set(window.getComputedStyle(content).getPropertyValue('will-change').split(',')).add('max-height').values()].filter(value => value !== 'auto').join(','));
-    content.animate({ maxHeight: isOpen ? ['0', height] : [height, '0'] }, { duration: this.settings.animation.duration, easing: this.settings.animation.easing }).addEventListener('finish', () => {
+    const summary = details.querySelector('summary');
+    const min = `${summary!.scrollHeight}px`;
+    const max = `${parseInt(min) + summary!.nextElementSibling!.scrollHeight}px`;
+    details.style.setProperty('overflow', 'clip');
+    details.style.setProperty('will-change', [...new Set(window.getComputedStyle(details).getPropertyValue('will-change').split(',')).add('height').values()].filter(value => value !== 'auto').join(','));
+    details.animate({ height: isOpen ? [min, max] : [max, min] }, { duration: this.settings.animation.duration, easing: this.settings.animation.easing }).addEventListener('finish', () => {
       root.removeAttribute('data-disclosure-animating');
       if (name) details.setAttribute('name', name);
       if (!isOpen) {
         details.removeAttribute('open');
         details.removeAttribute('data-disclosure-closing');
       }
-      ['max-height', 'overflow', 'will-change'].forEach(name => content.style.removeProperty(name));
+      ['height', 'overflow', 'will-change'].forEach(name => details.style.removeProperty(name));
     });
   }
 
