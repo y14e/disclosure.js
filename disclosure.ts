@@ -9,7 +9,7 @@ class Disclosure {
   root: HTMLElement;
   defaults: DisclosureOptions;
   settings: DisclosureOptions;
-  details: NodeListOf<HTMLElement>;
+  detailses: NodeListOf<HTMLElement>;
   summaries: NodeListOf<HTMLElement>;
   contents: NodeListOf<HTMLElement>;
 
@@ -26,10 +26,10 @@ class Disclosure {
     };
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.settings.animation.duration = 0;
     const NOT_NESTED = ':not(:scope summary + * *)';
-    this.details = this.root.querySelectorAll(`details${NOT_NESTED}`);
+    this.detailses = this.root.querySelectorAll(`details${NOT_NESTED}`);
     this.summaries = this.root.querySelectorAll(`summary${NOT_NESTED}`);
     this.contents = this.root.querySelectorAll(`summary${NOT_NESTED} + *`);
-    if (!this.details.length || !this.details.length || !this.contents.length) return;
+    if (!this.detailses.length || !this.summaries.length || !this.contents.length) return;
     this.initialize();
   }
 
