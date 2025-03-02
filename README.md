@@ -7,5 +7,5 @@ import Disclosure from './disclosure.js';
 const disclosure = new Disclosure(...);
 ```
 ## Demo
-- https://y14e.github.io/disclosure.js/
-- https://y14e.github.io/disclosure.js/index-css.html
+- https://y14e.github.io/disclosure-js/
+- https://y14e.github.io/disclosure-js/index-css.html
