@@ -40,7 +40,7 @@ class Disclosure {
   private initialize(): void {
     this.detailses.forEach(details => {
       if (details.hasAttribute('name')) details.setAttribute('data-disclosure-name', details.getAttribute('name')!);
-      const setData = () => details.setAttribute('data-disclosure-open', String(details.hasAttribute('open')));
+      const setData = (): void => details.setAttribute('data-disclosure-open', String(details.hasAttribute('open')));
       new MutationObserver(setData).observe(details, { attributeFilter: ['open'] });
       setData();
     });
