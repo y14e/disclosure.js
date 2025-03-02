@@ -4,7 +4,7 @@ A disclosure pattern implementation in JS. Using the `<details>` and `<summary>`
 ```js
 import Disclosure from './disclosure.js';
 
-const disclosure = new Disclosure(...);
+const myDisclosure = new Disclosure(...);
 ```
 ## Demo
 - https://y14e.github.io/disclosure-js/
