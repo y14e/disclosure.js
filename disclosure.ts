@@ -40,9 +40,9 @@ class Disclosure {
   private initialize(): void {
     this.detailses.forEach(details => {
       if (details.hasAttribute('name')) details.setAttribute('data-disclosure-name', details.getAttribute('name')!);
-      const syncOpen = () => details.setAttribute('data-disclosure-open', String(details.hasAttribute('open')));
-      new MutationObserver(() => syncOpen()).observe(details, { attributeFilter: ['open'] });
-      syncOpen();
+      const setData = () => details.setAttribute('data-disclosure-open', String(details.hasAttribute('open')));
+      new MutationObserver(setData).observe(details, { attributeFilter: ['open'] });
+      setData();
     });
     this.summaries.forEach(summary => {
       summary.addEventListener('click', event => this.handleClick(event));
