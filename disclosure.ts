@@ -5,6 +5,10 @@ type DisclosureOptions = {
   };
 };
 
+interface HTMLDetailsElement_animation extends HTMLDetailsElement {
+  _animation?: Animation | null;
+}
+
 class Disclosure {
   root: HTMLElement;
   defaults: DisclosureOptions;
@@ -34,6 +38,12 @@ class Disclosure {
   }
 
   private initialize(): void {
+    this.detailses.forEach(details => {
+      if (details.hasAttribute('name')) details.setAttribute('data-disclosure-name', details.getAttribute('name')!);
+      const syncOpen = () => details.setAttribute('data-disclosure-open', String(details.hasAttribute('open')));
+      new MutationObserver(() => syncOpen()).observe(details, { attributeFilter: ['open'] });
+      syncOpen();
+    });
     this.summaries.forEach(summary => {
       summary.addEventListener('click', event => this.handleClick(event));
       summary.addEventListener('keydown', event => this.handleKeyDown(event));
@@ -41,41 +51,34 @@ class Disclosure {
     this.root.setAttribute('data-disclosure-initialized', '');
   }
 
-  private toggle(details: HTMLDetailsElement, isOpen: boolean): void {
-    const root = this.root;
-    root.setAttribute('data-disclosure-animating', '');
-    const name = details.getAttribute('name');
+  private toggle(details: HTMLDetailsElement_animation, isOpen: boolean): void {
+    const name = details.getAttribute('data-disclosure-name');
     if (name) {
       details.removeAttribute('name');
-      const opened = document.querySelector(`details[name="${name}"][open]`) as HTMLDetailsElement;
+      const opened = document.querySelector(`details[data-disclosure-name="${name}"][data-disclosure-open="true"]`) as HTMLDetailsElement;
       if (isOpen && opened && opened !== details) this.close(opened);
     }
-    if (isOpen) {
-      details.setAttribute('open', '');
-    } else {
-      details.setAttribute('data-disclosure-closing', '');
-    }
+    details.setAttribute('data-disclosure-open', String(isOpen));
+    const height = `${details.offsetHeight}px`;
+    if (isOpen) details.setAttribute('open', '');
     details.style.setProperty('overflow', 'clip');
     details.style.setProperty('will-change', [...new Set(window.getComputedStyle(details).getPropertyValue('will-change').split(',')).add('height').values()].filter(value => value !== 'auto').join(','));
-    const summary = details.querySelector('summary');
-    const min = `${summary!.scrollHeight}px`;
-    const max = `${parseInt(min) + summary!.nextElementSibling!.scrollHeight}px`;
-    details.animate({ height: isOpen ? [min, max] : [max, min] }, { duration: this.settings.animation.duration, easing: this.settings.animation.easing }).addEventListener('finish', () => {
-      root.removeAttribute('data-disclosure-animating');
-      if (name) details.setAttribute('name', name);
-      if (!isOpen) {
-        details.removeAttribute('open');
-        details.removeAttribute('data-disclosure-closing');
-      }
+    if (details._animation) details._animation.cancel();
+    const content = details.querySelector('summary + *');
+    content!.removeAttribute('hidden');
+    details._animation = details.animate({ height: [height, `${details.querySelector('summary')!.scrollHeight + (isOpen ? content!.scrollHeight : 0)}px`] }, { duration: this.settings.animation.duration, easing: this.settings.animation.easing });
+    details._animation.addEventListener('finish', () => {
+      details._animation = null;
+      if (name) details.setAttribute('name', details.getAttribute('data-disclosure-name')!);
+      if (!isOpen) details.removeAttribute('open');
       ['height', 'overflow', 'will-change'].forEach(name => details.style.removeProperty(name));
     });
   }
 
   private handleClick(event: MouseEvent): void {
     event.preventDefault();
-    if (this.root.hasAttribute('data-disclosure-animating')) return;
     const details = (event.currentTarget as HTMLElement).parentElement as HTMLDetailsElement;
-    this.toggle(details, !details.hasAttribute('open'));
+    this.toggle(details, details.getAttribute('data-disclosure-open') !== 'true');
   }
 
   private handleKeyDown(event: KeyboardEvent): void {
