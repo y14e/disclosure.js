@@ -5,10 +5,6 @@ type DisclosureOptions = {
   };
 };
 
-interface HTMLDetailsElement_animation extends HTMLDetailsElement {
-  _animation?: Animation | null;
-}
-
 class Disclosure {
   root: HTMLElement;
   defaults: DisclosureOptions;
@@ -16,6 +12,7 @@ class Disclosure {
   detailses: NodeListOf<HTMLElement>;
   summaries: NodeListOf<HTMLElement>;
   contents: NodeListOf<HTMLElement>;
+  animations: (Animation | null)[] = [];
 
   constructor(root: HTMLElement, options?: Partial<DisclosureOptions>) {
     this.root = root;
@@ -34,6 +31,7 @@ class Disclosure {
     this.summaries = this.root.querySelectorAll(`summary${NOT_NESTED}`);
     this.contents = this.root.querySelectorAll(`summary${NOT_NESTED} + *`);
     if (!this.detailses.length || !this.summaries.length || !this.contents.length) return;
+    this.animations = Array(this.detailses.length).fill(null);
     this.initialize();
   }
 
@@ -51,11 +49,11 @@ class Disclosure {
     this.root.setAttribute('data-disclosure-initialized', '');
   }
 
-  private toggle(details: HTMLDetailsElement_animation, isOpen: boolean): void {
+  private toggle(details: HTMLElement, isOpen: boolean): void {
     const name = details.getAttribute('data-disclosure-name');
     if (name) {
       details.removeAttribute('name');
-      const opened = document.querySelector(`details[data-disclosure-name="${name}"][data-disclosure-open="true"]`) as HTMLDetailsElement;
+      const opened = document.querySelector(`details[data-disclosure-name="${name}"][data-disclosure-open="true"]`) as HTMLElement;
       if (isOpen && opened && opened !== details) this.close(opened);
     }
     details.setAttribute('data-disclosure-open', String(isOpen));
@@ -63,12 +61,14 @@ class Disclosure {
     if (isOpen) details.setAttribute('open', '');
     details.style.setProperty('overflow', 'clip');
     details.style.setProperty('will-change', [...new Set(window.getComputedStyle(details).getPropertyValue('will-change').split(',')).add('height').values()].filter(value => value !== 'auto').join(','));
-    if (details._animation) details._animation.cancel();
-    const content = details.querySelector('summary + *');
-    content!.removeAttribute('hidden');
-    details._animation = details.animate({ height: [height, `${details.querySelector('summary')!.scrollHeight + (isOpen ? content!.scrollHeight : 0)}px`] }, { duration: this.settings.animation.duration, easing: this.settings.animation.easing });
-    details._animation.addEventListener('finish', () => {
-      details._animation = null;
+    const index = [...this.detailses].indexOf(details);
+    let animation = this.animations[index];
+    if (animation) animation.cancel();
+    const content = details.querySelector('summary + *')!;
+    content.removeAttribute('hidden');
+    animation = this.animations[index] = details.animate({ height: [height, `${details.querySelector('summary')!.scrollHeight + (isOpen ? content.scrollHeight : 0)}px`] }, { duration: this.settings.animation.duration, easing: this.settings.animation.easing });
+    animation.addEventListener('finish', () => {
+      animation = null;
       if (name) details.setAttribute('name', details.getAttribute('data-disclosure-name')!);
       if (!isOpen) details.removeAttribute('open');
       ['height', 'overflow', 'will-change'].forEach(name => details.style.removeProperty(name));
@@ -77,7 +77,7 @@ class Disclosure {
 
   private handleClick(event: MouseEvent): void {
     event.preventDefault();
-    const details = (event.currentTarget as HTMLElement).parentElement as HTMLDetailsElement;
+    const details = (event.currentTarget as HTMLElement).parentElement as HTMLElement;
     this.toggle(details, details.getAttribute('data-disclosure-open') !== 'true');
   }
 
@@ -106,11 +106,11 @@ class Disclosure {
     focusables[newIndex].focus();
   }
 
-  open(details: HTMLDetailsElement): void {
+  open(details: HTMLElement): void {
     this.toggle(details, true);
   }
 
-  close(details: HTMLDetailsElement): void {
+  close(details: HTMLElement): void {
     this.toggle(details, false);
   }
 }
