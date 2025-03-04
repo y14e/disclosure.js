@@ -20,6 +20,7 @@ class Disclosure {
   }
 
   private toggle(details: HTMLDetailsElement, isOpen: boolean): void {
+    if (details.hasAttribute('open') === isOpen) return;
     if (isOpen) {
       details.setAttribute('open', '');
     } else {

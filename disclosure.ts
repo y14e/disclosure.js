@@ -50,6 +50,7 @@ class Disclosure {
   }
 
   private toggle(details: HTMLElement, isOpen: boolean): void {
+    if ((details.getAttribute('data-disclosure-open') === 'true') === isOpen) return;
     const name = details.getAttribute('data-disclosure-name');
     if (name) {
       details.removeAttribute('name');
