@@ -12,7 +12,7 @@ class Disclosure {
   detailses: NodeListOf<HTMLElement>;
   summaries: NodeListOf<HTMLElement>;
   contents: NodeListOf<HTMLElement>;
-  animations: (Animation | null)[] = [];
+  animations!: (Animation | null)[];
 
   constructor(root: HTMLElement, options?: Partial<DisclosureOptions>) {
     this.root = root;
