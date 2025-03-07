@@ -6,16 +6,16 @@ type DisclosureOptions = {
 };
 
 class Disclosure {
-  root: HTMLElement;
+  rootElements: HTMLElement;
   defaults: DisclosureOptions;
   settings: DisclosureOptions;
-  detailses: NodeListOf<HTMLElement>;
-  summaries: NodeListOf<HTMLElement>;
-  contents: NodeListOf<HTMLElement>;
+  detailsElements: NodeListOf<HTMLElement>;
+  summaryElements: NodeListOf<HTMLElement>;
+  contentElements: NodeListOf<HTMLElement>;
   animations!: (Animation | null)[];
 
   constructor(root: HTMLElement, options?: Partial<DisclosureOptions>) {
-    this.root = root;
+    this.rootElements = root;
     this.defaults = {
       animation: {
         duration: 300,
@@ -26,46 +26,57 @@ class Disclosure {
       animation: { ...this.defaults.animation, ...options?.animation },
     };
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.settings.animation.duration = 0;
-    const NOT_NESTED = ':not(:scope summary + * *)';
-    this.detailses = this.root.querySelectorAll(`details${NOT_NESTED}`);
-    this.summaries = this.root.querySelectorAll(`summary${NOT_NESTED}`);
-    this.contents = this.root.querySelectorAll(`summary${NOT_NESTED} + *`);
-    if (!this.detailses.length || !this.summaries.length || !this.contents.length) return;
-    this.animations = Array(this.detailses.length).fill(null);
+    let NOT_NESTED = ':not(:scope summary + * *)';
+    this.detailsElements = this.rootElements.querySelectorAll(`details${NOT_NESTED}`);
+    this.summaryElements = this.rootElements.querySelectorAll(`summary${NOT_NESTED}`);
+    this.contentElements = this.rootElements.querySelectorAll(`summary${NOT_NESTED} + *`);
+    if (!this.detailsElements.length || !this.summaryElements.length || !this.contentElements.length) return;
+    this.animations = Array(this.detailsElements.length).fill(null);
     this.initialize();
   }
 
   private initialize(): void {
-    this.detailses.forEach(details => {
+    this.detailsElements.forEach(details => {
       if (details.hasAttribute('name')) details.setAttribute('data-disclosure-name', details.getAttribute('name')!);
-      const setData = (): void => details.setAttribute('data-disclosure-open', String(details.hasAttribute('open')));
+      let setData = (): void => details.setAttribute('data-disclosure-open', String(details.hasAttribute('open')));
       new MutationObserver(setData).observe(details, { attributeFilter: ['open'] });
       setData();
     });
-    this.summaries.forEach(summary => {
+    this.summaryElements.forEach(summary => {
+      if (!this.isFocusable(summary)) {
+        summary.setAttribute('tabindex', '-1');
+        summary.style.setProperty('pointer-events', 'none');
+      }
       summary.addEventListener('click', event => this.handleSummaryClick(event));
       summary.addEventListener('keydown', event => this.handleSummaryKeyDown(event));
     });
-    this.root.setAttribute('data-disclosure-initialized', '');
+    this.contentElements.forEach(content => {
+      if (!this.isFocusable(content.previousElementSibling as HTMLElement)) content.setAttribute('hidden', '');
+    });
+    this.rootElements.setAttribute('data-disclosure-initialized', '');
+  }
+
+  private isFocusable(summary: HTMLElement): boolean {
+    return summary.parentElement!.getAttribute('aria-disabled') !== 'true';
   }
 
   private toggle(details: HTMLElement, isOpen: boolean): void {
     if ((details.getAttribute('data-disclosure-open') === 'true') === isOpen) return;
-    const name = details.getAttribute('data-disclosure-name');
+    let name = details.getAttribute('data-disclosure-name');
     if (name) {
       details.removeAttribute('name');
-      const opened = document.querySelector(`details[data-disclosure-name="${name}"][data-disclosure-open="true"]`) as HTMLElement;
+      let opened = document.querySelector(`details[data-disclosure-name="${name}"][data-disclosure-open="true"]`) as HTMLElement;
       if (isOpen && opened && opened !== details) this.close(opened);
     }
     details.setAttribute('data-disclosure-open', String(isOpen));
-    const height = `${details.offsetHeight}px`;
+    let height = `${details.offsetHeight}px`;
     if (isOpen) details.setAttribute('open', '');
     details.style.setProperty('overflow', 'clip');
     details.style.setProperty('will-change', [...new Set(window.getComputedStyle(details).getPropertyValue('will-change').split(',')).add('height').values()].filter(value => value !== 'auto').join(','));
-    const index = [...this.detailses].indexOf(details);
+    let index = [...this.detailsElements].indexOf(details);
     let animation = this.animations[index];
     if (animation) animation.cancel();
-    const content = details.querySelector('summary + *')!;
+    let content = details.querySelector('summary + *')!;
     content.removeAttribute('hidden');
     animation = this.animations[index] = details.animate({ height: [height, `${details.querySelector('summary')!.scrollHeight + (isOpen ? content.scrollHeight : 0)}px`] }, { duration: this.settings.animation.duration, easing: this.settings.animation.easing });
     animation.addEventListener('finish', () => {
@@ -78,17 +89,17 @@ class Disclosure {
 
   private handleSummaryClick(event: MouseEvent): void {
     event.preventDefault();
-    const details = (event.currentTarget as HTMLElement).parentElement as HTMLElement;
+    let details = (event.currentTarget as HTMLElement).parentElement!;
     this.toggle(details, details.getAttribute('data-disclosure-open') !== 'true');
   }
 
   private handleSummaryKeyDown(event: KeyboardEvent): void {
-    const { key } = event;
+    let { key } = event;
     if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) return;
     event.preventDefault();
-    const nonDisabledSummaries = [...this.summaries].filter(summary => summary.getAttribute('aria-disabled') !== 'true');
-    const currentIndex = nonDisabledSummaries.indexOf(document.activeElement as HTMLElement);
-    const length = nonDisabledSummaries.length;
+    let focusableSummaries = [...this.summaryElements].filter(this.isFocusable);
+    let currentIndex = focusableSummaries.indexOf(document.activeElement as HTMLElement);
+    let length = focusableSummaries.length;
     let newIndex = currentIndex;
     switch (key) {
       case 'ArrowUp':
@@ -104,7 +115,7 @@ class Disclosure {
         newIndex = length - 1;
         break;
     }
-    nonDisabledSummaries[newIndex].focus();
+    focusableSummaries[newIndex].focus();
   }
 
   open(details: HTMLElement): void {
