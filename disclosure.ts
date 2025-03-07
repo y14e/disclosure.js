@@ -43,8 +43,8 @@ class Disclosure {
       setData();
     });
     this.summaries.forEach(summary => {
-      summary.addEventListener('click', event => this.handleClick(event));
-      summary.addEventListener('keydown', event => this.handleKeyDown(event));
+      summary.addEventListener('click', event => this.handleSummaryClick(event));
+      summary.addEventListener('keydown', event => this.handleSummaryKeyDown(event));
     });
     this.root.setAttribute('data-disclosure-initialized', '');
   }
@@ -76,19 +76,19 @@ class Disclosure {
     });
   }
 
-  private handleClick(event: MouseEvent): void {
+  private handleSummaryClick(event: MouseEvent): void {
     event.preventDefault();
     const details = (event.currentTarget as HTMLElement).parentElement as HTMLElement;
     this.toggle(details, details.getAttribute('data-disclosure-open') !== 'true');
   }
 
-  private handleKeyDown(event: KeyboardEvent): void {
+  private handleSummaryKeyDown(event: KeyboardEvent): void {
     const { key } = event;
     if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(key)) return;
     event.preventDefault();
-    const focusables = [...this.summaries].filter(summary => summary.getAttribute('aria-disabled') !== 'true');
-    const currentIndex = focusables.indexOf(document.activeElement as HTMLElement);
-    const length = focusables.length;
+    const nonDisabledSummaries = [...this.summaries].filter(summary => summary.getAttribute('aria-disabled') !== 'true');
+    const currentIndex = nonDisabledSummaries.indexOf(document.activeElement as HTMLElement);
+    const length = nonDisabledSummaries.length;
     let newIndex = currentIndex;
     switch (key) {
       case 'ArrowUp':
@@ -104,7 +104,7 @@ class Disclosure {
         newIndex = length - 1;
         break;
     }
-    focusables[newIndex].focus();
+    nonDisabledSummaries[newIndex].focus();
   }
 
   open(details: HTMLElement): void {
