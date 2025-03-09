@@ -67,7 +67,7 @@ class Disclosure {
       let opened = document.querySelector(`details[data-disclosure-name="${name}"][data-disclosure-open="true"]`) as HTMLElement;
       if (isOpen && opened && opened !== details) this.close(opened);
     }
-    details.setAttribute('data-disclosure-open', String(isOpen));
+    window.requestAnimationFrame(() => details.setAttribute('data-disclosure-open', String(isOpen)));
     let height = `${details.offsetHeight}px`;
     if (isOpen) details.setAttribute('open', '');
     details.style.setProperty('overflow', 'clip');
