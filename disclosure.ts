@@ -61,7 +61,6 @@ class Disclosure {
   }
 
   private toggle(details: HTMLElement, isOpen: boolean): void {
-    if ((details.getAttribute('data-disclosure-open') === 'true') === isOpen) return;
     let name = details.getAttribute('data-disclosure-name');
     if (name) {
       details.removeAttribute('name');
@@ -119,10 +118,12 @@ class Disclosure {
   }
 
   open(details: HTMLElement): void {
+    if (details.getAttribute('data-disclosure-open') === 'true') return;
     this.toggle(details, true);
   }
 
   close(details: HTMLElement): void {
+    if (details.getAttribute('data-disclosure-open') === 'false') return;
     this.toggle(details, false);
   }
 }

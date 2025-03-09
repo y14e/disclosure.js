@@ -33,7 +33,6 @@ class Disclosure {
   }
 
   private toggle(details: HTMLElement, isOpen: boolean): void {
-    if (details.hasAttribute('open') === isOpen) return;
     if (isOpen) {
       details.setAttribute('open', '');
     } else {
@@ -67,10 +66,12 @@ class Disclosure {
   }
 
   open(details: HTMLElement): void {
+    if (details.hasAttribute('open')) return;
     this.toggle(details, true);
   }
 
   close(details: HTMLElement): void {
+    if (!details.hasAttribute('open')) return;
     this.toggle(details, false);
   }
 }
